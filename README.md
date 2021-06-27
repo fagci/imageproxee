@@ -10,4 +10,4 @@ Resize & convert images proxy with caching.
 
 ```./imageproxee.py /var/www/site.com/public/images/```
 
-```https://site.com/image.png?ft=jpg&q=82&mw=320%mh=240```
+```https://site.com/image.png?t=jpg&q=82&mw=320%mh=240```

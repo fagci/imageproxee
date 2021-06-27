@@ -6,9 +6,14 @@ from PIL import Image
 from fire import Fire
 from flask import Flask, Response, request
 
+MAX_WIDTH = 1024
+MAX_HEIGHT = 768
+QUALITY = 87
+
 app = Flask(__name__)
 
 DIR = Path(__file__).resolve().parent
+
 ROOT_PATH = DIR
 CACHE_PATH = DIR / 'cache'
 
@@ -39,10 +44,10 @@ def image(path):
 
     img_path = get_image(
         orig_img_path,
-        get_iarg('mw', 768),
-        get_iarg('mh', 640),
-        get_iarg('q', 85),
-        get_arg('ft')
+        get_iarg('mw', MAX_WIDTH),
+        get_iarg('mh', MAX_HEIGHT),
+        get_iarg('q', QUALITY),
+        get_arg('t')
     )
 
     mt, _ = mimetypes.guess_type(img_path)
