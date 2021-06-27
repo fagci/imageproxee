@@ -8,8 +8,9 @@ from flask import Flask, Response, request
 
 app = Flask(__name__)
 
-root = '.'
-CACHE_PATH = Path(__file__).resolve().parent / 'cache'
+DIR = Path(__file__).resolve().parent
+root = DIR
+CACHE_PATH = DIR / 'cache'
 
 def get_image(path:Path, mw=768, mh=640, quality=85, ft=None):
     if not ft:
@@ -25,7 +26,7 @@ def get_image(path:Path, mw=768, mh=640, quality=85, ft=None):
 
 @app.route('/<path:path>')
 def image(path):
-    orig_img_path = Path(path).relative_to(root)
+    orig_img_path = (root / path).resolve().relative_to(root).resolve()
     if not orig_img_path.exists():
         return Response(status=404)
     args = request.args
@@ -46,7 +47,8 @@ def image(path):
 
 def main(images_root):
     global root
-    root = images_root
+    root = Path(images_root).resolve()
+    print(str(root))
     if not CACHE_PATH.exists():
         CACHE_PATH.mkdir()
     app.run()
