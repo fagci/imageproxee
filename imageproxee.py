@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from pathlib import Path
 import mimetypes
+from pathlib import Path
 
 from PIL import Image
 from fire import Fire
@@ -17,7 +17,7 @@ def get_image(path:Path, mw=768, mh=640, quality=85, ft=None):
         ft = path.suffix[1:]
     cached_img_hash = str(hash(f'{path}:{mw}:{mh}:{quality}'))
     cached_img_path = CACHE_PATH / f'{cached_img_hash}.{ft}'
-    if not cached_img_path.exists():
+    if (not cached_img_path.exists()) or path.stat().st_mtime > cached_img_path.stat().st_mtime:
         img = Image.open(path)
         img.thumbnail((mw, mh))
         img.save(cached_img_path, quality=quality)
@@ -26,7 +26,7 @@ def get_image(path:Path, mw=768, mh=640, quality=85, ft=None):
 
 @app.route('/<path:path>')
 def image(path):
-    orig_img_path = (ROOT_PATH / path).resolve(True)
+    orig_img_path = (ROOT_PATH / path).resolve()
     if not orig_img_path.exists():
         return Response(status=404)
     arg = request.args.get
