@@ -9,7 +9,7 @@ from flask import Flask, Response, request
 app = Flask(__name__)
 
 DIR = Path(__file__).resolve().parent
-root = DIR
+ROOT_PATH = DIR
 CACHE_PATH = DIR / 'cache'
 
 def get_image(path:Path, mw=768, mh=640, quality=85, ft=None):
@@ -26,7 +26,7 @@ def get_image(path:Path, mw=768, mh=640, quality=85, ft=None):
 
 @app.route('/<path:path>')
 def image(path):
-    orig_img_path = (root / path).resolve(True)
+    orig_img_path = (ROOT_PATH / path).resolve(True)
     if not orig_img_path.exists():
         return Response(status=404)
     arg = request.args.get
@@ -44,9 +44,11 @@ def image(path):
         return Response(img.read(), mimetype=mt)
 
 
-def main(images_root):
-    global root
-    root = Path(images_root).resolve()
+def main(images_dir, cache_dir='cache'):
+    global ROOT_PATH
+    global CACHE_PATH
+    ROOT_PATH = Path(images_dir).resolve()
+    CACHE_PATH = Path(cache_dir).resolve()
     if not CACHE_PATH.exists():
         CACHE_PATH.mkdir()
     app.run()
