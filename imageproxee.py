@@ -32,7 +32,7 @@ def image(path):
     args = request.args
 
     mw = int(args.get('mw', 768))
-    mh = int(args.get('mw', 640))
+    mh = int(args.get('mh', 640))
     quality = int(args.get('q', 85))
     ft = args.get('ft')
 
