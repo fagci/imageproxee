@@ -26,15 +26,15 @@ def get_image(path:Path, mw=768, mh=640, quality=85, ft=None):
 
 @app.route('/<path:path>')
 def image(path):
-    orig_img_path = (root / path).resolve().relative_to(root).resolve()
+    orig_img_path = (root / path).resolve(True)
     if not orig_img_path.exists():
         return Response(status=404)
-    args = request.args
+    arg = request.args.get
 
-    mw = int(args.get('mw', 768))
-    mh = int(args.get('mh', 640))
-    quality = int(args.get('q', 85))
-    ft = args.get('ft')
+    mw = int(arg('mw', 768))
+    mh = int(arg('mh', 640))
+    quality = int(arg('q', 85))
+    ft = arg('ft')
 
     img_path = get_image(orig_img_path, mw, mh, quality, ft)
 
