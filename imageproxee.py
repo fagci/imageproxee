@@ -12,31 +12,38 @@ DIR = Path(__file__).resolve().parent
 ROOT_PATH = DIR
 CACHE_PATH = DIR / 'cache'
 
-def get_image(path:Path, mw=768, mh=640, quality=85, ft=None):
-    if not ft:
-        ft = path.suffix[1:]
-    cached_img_hash = str(hash(f'{path}:{mw}:{mh}:{quality}'))
-    cached_img_path = CACHE_PATH / f'{cached_img_hash}.{ft}'
-    if (not cached_img_path.exists()) or path.stat().st_mtime > cached_img_path.stat().st_mtime:
-        img = Image.open(path)
+def get_image(src_path:Path, mw=768, mh=640, quality=85, ext=None):
+    if not ext:
+        ext = src_path.suffix[1:]
+
+    dst_hash = str(hash(f'{src_path}:{mw}:{mh}:{quality}'))
+    dst_path = CACHE_PATH / f'{dst_hash}.{ext}'
+
+    if (not dst_path.exists()) or src_path.stat().st_mtime > dst_path.stat().st_mtime:
+        img = Image.open(src_path)
         img.thumbnail((mw, mh))
-        img.save(cached_img_path, quality=quality)
-    return cached_img_path
+        img.save(dst_path, quality=quality)
+
+    return dst_path
 
 
 @app.route('/<path:path>')
 def image(path):
     orig_img_path = (ROOT_PATH / path).resolve()
+
     if not orig_img_path.exists():
         return Response(status=404)
-    arg = request.args.get
 
-    mw = int(arg('mw', 768))
-    mh = int(arg('mh', 640))
-    quality = int(arg('q', 85))
-    ft = arg('ft')
+    get_arg = request.args.get
+    get_iarg = lambda n, d: int(get_arg(n, d))
 
-    img_path = get_image(orig_img_path, mw, mh, quality, ft)
+    img_path = get_image(
+        orig_img_path,
+        get_iarg('mw', 768),
+        get_iarg('mh', 640),
+        get_iarg('q', 85),
+        get_arg('ft')
+    )
 
     mt, _ = mimetypes.guess_type(img_path)
 
@@ -47,10 +54,12 @@ def image(path):
 def main(images_dir, cache_dir='cache'):
     global ROOT_PATH
     global CACHE_PATH
+
     ROOT_PATH = Path(images_dir).resolve()
     CACHE_PATH = Path(cache_dir).resolve()
-    if not CACHE_PATH.exists():
-        CACHE_PATH.mkdir()
+
+    CACHE_PATH.mkdir(exist_ok=True)
+
     app.run()
 
 if __name__ == '__main__':
