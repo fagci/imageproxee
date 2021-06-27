@@ -36,6 +36,10 @@ def get_image(src_path:Path, mw=768, mh=640, quality=85, ext=None):
 def image(path):
     orig_img_path = (ROOT_PATH / path).resolve()
 
+    # strict path to root
+    if not orig_img_path.is_relative_to(ROOT_PATH):
+        return Response(status=404)
+
     if not orig_img_path.exists():
         return Response(status=404)
 
