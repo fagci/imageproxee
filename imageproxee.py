@@ -39,7 +39,6 @@ def image(path):
     img_path = get_image(orig_img_path, mw, mh, quality, ft)
 
     mt, _ = mimetypes.guess_type(img_path)
-    print(mt)
 
     with img_path.open('rb') as img:
         return Response(img.read(), mimetype=mt)
@@ -48,7 +47,6 @@ def image(path):
 def main(images_root):
     global root
     root = Path(images_root).resolve()
-    print(str(root))
     if not CACHE_PATH.exists():
         CACHE_PATH.mkdir()
     app.run()
